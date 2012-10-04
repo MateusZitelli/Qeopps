@@ -17,22 +17,19 @@
 			 (print-list flags)
 			 (write-line "####################################")))
 
-(define compile (lambda (dir file flags)
-		  ;TODO: Se o file tiver . no nome
+(define compile (lambda (input_file flags output_file)
 		  (define flags_string (string-join flags " "))
-		  (define input_file (string-append dir file))
-		  (define file_name (car (string-split file ".")))
-		  (define output_file (string-append dir file_name ".bin"))
 		  (define gcc_string (string-append "gcc " input_file " " flags_string " -o " output_file))
 		  (write-line gcc_string)
 		  (run gcc_string)))
 
-(define benchmark(lambda (dir file)
-		   (define file_name (car (string-split file ".")))
-		   (define output_file (string-append dir file_name ".bin"))
-		   (define gprof_string (string-append "gprof " output_file))
-		   (run gprof_string)
-))
+(define execute(lambda (binary)
+		   (define command (string-append "./" binary))
+		   (run command)))
+
+(define benchmark(lambda (binary)
+		   (define gprof_string (string-append "gprof " binary))
+		   (run gprof_string)))
 
 (define parser (lambda (text)
 		 (define parsed_txt (string-split text "\t"))
@@ -43,9 +40,14 @@
 			(if (not (char=? (string-ref dir (- (string-length dir) 1)) #\/))
 			    (set! dir (string-append dir "/")))
 			(define flags (string-split (car (cdr (cdr parsed_txt))) " "))
+			(define input_file (string-append dir file))
+			;TODO: Tratamento se o "file" tiver . no nome
+			(define file_name (car (string-split file ".")))
+			(define output_file (string-append dir file_name ".bin"))
 			(parser_message dir file flags)
-			(compile dir file flags)
-			(benchmark dir file)
+			(compile input_file flags output_file)
+			(execute output_file)
+			(benchmark output_file)
 			"Ok")
 		       (else "Correct Syntax:dir\tfile\tflag1 flag2...\t"))))
 
