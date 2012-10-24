@@ -14,7 +14,7 @@
 (define receive-binary (lambda (input output file_port)
 			 (write-line "O")
 			 (write-line "O" output)
-			 (let ((chr (read input)))
+			 (let ((chr (read-line input)))
 			   (write-line "O2")
 			   (display chr)
 			   (display chr file_port)
