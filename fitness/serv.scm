@@ -44,11 +44,9 @@
 		   (run gprof_string)))
 
 (define parser (lambda (input output)
-		 ;(write-line "foi" output)
 		 (define text (read-line input))
 		 (display text)
 		 (define parsed_txt (string-split text "\t"))
-		 ;(write-line "foi" output)
 		 (define arguments_parsed (length parsed_txt))
 		 (if (or (= arguments_parsed 3) (= arguments_parsed 2))
 		     (let ((dir (car parsed_txt)))
