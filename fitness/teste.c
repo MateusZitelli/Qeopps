@@ -7,24 +7,31 @@ pthread_cond_t new_data_condition = PTHREAD_COND_INITIALIZER, redy_condition = P
 
 void * modify(void * arg){
   int * data = (int *) arg;
-  int val = 0;
+  int val = 0, i, j;
   while(val < 1000){
     pthread_mutex_lock(&mutex_data);
     *data = val;
     pthread_mutex_unlock(&mutex_data);
     pthread_cond_signal(&new_data_condition);
     val += 1;
+    j = 0;
+    for(i = 10E4; i > val; i--)
+      j += i;
     printf("KDSHAKHDK\n");
   }
 }
 
 void * print(void * arg){
   int * data = (int *) arg;
+  int i, j;
   while(1){
     pthread_mutex_lock(&mutex_data);
     pthread_cond_wait(&new_data_condition, &mutex_data);
     printf("%i\n", * data);
     pthread_mutex_unlock(&mutex_data);
+    j = 0;
+    for(i = 10E4; i > 0; i--)
+      j += i;
   }
 }
 
