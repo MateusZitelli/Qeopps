@@ -4,10 +4,13 @@ class TreeNode:
         self.data = data
         self.index = index
         self.parent = parent
+        if(parent != None):
+            self.depth = self.parent.depth + 1
 
     def add_child(self, child):
         self.childs.append(child)
         child.parent = self
+        child.depth = self.depth + 1
 
 class Tree:
     def __init__(self, root=None):
