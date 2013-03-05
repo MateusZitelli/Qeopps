@@ -61,6 +61,7 @@ class SyncTable:
         else:
             new_tables = [SyncTable(slices[2] + slices[0]),\
                 SyncTable(slices[3] + slices[1])]
+	return new_tables
 
 def generate_population(base_table, population_size,\
     scope_mutations, type_mutations):
