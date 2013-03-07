@@ -12,7 +12,6 @@ class Parser:
             current_node = self.tree.root
         for i, j in enumerate(self.lines):
             if "}" in j:
-                print j
                 for i in j:
                     if i == "}":
                         current_node = current_node.parent
@@ -40,10 +39,13 @@ class Parser:
                 else:
                     function = j.split("(")[0]
                     args = j[j.find("(")+1:j.find(")")]
-                    func_node = self.tree.new_node(function+"("+args+")",\
+                    func_node = self.tree.new_node(function.replace("\n", "").lstrip(' ')+"("+args+")",\
                         current_node)
                     current_node = func_node
             else:
-                print current_node
-                self.tree.new_node(j,\
+                if "#" in j:
+                    self.tree.new_node(j.lstrip(' '),\
+                        current_node)
+                else:
+                    self.tree.new_node(j.replace("\n", "").lstrip(' '),\
                         current_node)
