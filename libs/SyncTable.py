@@ -2,19 +2,24 @@ import random, copy
 import Tree
 class Sync:
     def __init__(self, sync_type, variables, scope):
+    """ sync_type -> 0 - Mutex, 1 - STM
+        variables -> List of variables calsses
+        scope -> Scope of the sync"""
         self.sync_type = sync_type
         self.variables = list(variables)
         self.scope = scope
+        self.init_depth = scope.depth
 
     def mutate_type(self):
         self.sync_type = random.randrange(2)
 
     def mutate_scope(self, move_up = None):
+        childs_quant = len(self.scope.childs)
         if(move_up == None):
             move_up = random.randrange(2)
         if(move_up and self.scope.parent != None):
             self.scope = self.scope.parent
-        elif(len(self.scope.childs)):
+        elif(childs_quant and self.init_depth > self.scope.depth):
             self.scope = random.choice(self.scope.childs)
             
 class Transaction:

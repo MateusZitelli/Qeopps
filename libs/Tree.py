@@ -6,11 +6,15 @@ class TreeNode:
         self.parent = parent
         if(parent != None):
             self.depth = self.parent.depth + 1
-
+        else:
+            self.depth = 0
     def add_child(self, child):
         self.childs.append(child)
         child.parent = self
         child.depth = self.depth + 1
+
+    def string_node(self):
+        return "[" + str(self.data) + "]"
 
 class Tree:
     def __init__(self, root=None):
@@ -34,3 +38,11 @@ class Tree:
             raise RuntimeError ("The parent node isn't in this tree.")
         self.size += 1
         return self.nodes[-1]
+
+    def print_recursive(self, node, level = 0):
+        print " " * level + node.string_node()
+        for n in node.childs:
+            self.print_recursive(n, level + 1)
+
+    def print_tree(self):
+        self.print_recursive(self.root, 0)

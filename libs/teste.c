@@ -17,7 +17,7 @@ void * modify(void * arg){
     j = 0;
     for(i = 10E4; i > val; i--)
       j += i;
-    printf("KDSHAKHDK\n");
+    printf("TESTETESTE\n");
   }
 }
 
@@ -25,6 +25,7 @@ void * print(void * arg){
   int * data = (int *) arg;
   int i, j;
   while(1){
+    #pragma omp
     pthread_mutex_lock(&mutex_data);
     pthread_cond_wait(&new_data_condition, &mutex_data);
     printf("%i\n", * data);
