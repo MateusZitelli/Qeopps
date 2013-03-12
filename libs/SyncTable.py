@@ -34,8 +34,11 @@ class Transaction:
         
 
 class SyncTable:
-    def __init__(self, transactions):
-        self.transactions = list(transacations)
+    def __init__(self, transactions = None):
+        if(transactions != None):
+            self.transactions = list(transacations)
+        else:
+            self.transactions = []
         self.size = len(self.transactions)
 
     def mutate(self, mutation_type = None):
