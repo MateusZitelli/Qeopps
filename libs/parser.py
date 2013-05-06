@@ -30,7 +30,6 @@ class Parser:
                 continue
             #Parse end of a period
             match_end_period = re.match(r'\s*}', j)
-            print current_node
             if match_end_period:
                 current_node = current_node.parent
                 continue
@@ -52,6 +51,8 @@ class Parser:
                     varibles = match_Queopps_tag.groups()[i * 2 + 1].split(",")
                     for var in varibles:
                         var = var.strip(" ")
+                        if var == "":
+                            continue
                         if VERBOSE: print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
                         s = Sync(SYNC_TYPE["mutex"], var, current_node, SYNC_RW[j])
                         syncs.append(s)
@@ -105,16 +106,20 @@ class Parser:
                 function_name = match_functions.group(2)
                 args = match_functions.group(3)
                 func_string = "%s %s(%s)" % (return_type, function_name, args)
-                func_node = self.tree.new_node((NODE_TYPE["FUNCTION_NODE"],func_string), current_node)
+                func_node = self.tree.new_node([NODE_TYPE["FUNCTION_NODE"],func_string, function_name], current_node)
                 if VERBOSE: print current_node.depth * " ", func_string
                 current_node = func_node
                 self.functions[function_name] = func_node
                 continue
 
             #Parse fuctions calls
-            match_function_call = re.match(r'\s*(.+)\(.*\)', j)
+            match_function_call = re.match(r'\s*(.+)\((.*)\)', j)
             if match_function_call and match_function_call.group(1) in self.functions:
-                function_node = self.functions[match_function_call.group(1)]
+                function_name = match_function_call.group(1)
+                args = match_function_call.group(2)
+                function_node = self.functions[function_name]
+                function_string = "%s(%s)" % (function_name, args)
+                function_node.data.append(function_string)
                 current_node.childs.append(function_node)
                 continue
             #Parse command lines
@@ -122,6 +127,7 @@ class Parser:
             if command_match:
                 command_node = self.tree.new_node((NODE_TYPE["NORMAL_NODE"],command_match.group(1)), current_node)
                 if VERBOSE: print current_node.depth * " ",command_match.group(1)
-        self.tree.print_tree()
+        #self.tree.print_tree()
 
-Parser("teste2.c").parse()
+if __name__ == "__main__":
+    Parser("teste2.c").parse()

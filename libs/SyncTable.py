@@ -10,11 +10,11 @@ class Sync:
         variables -> List of variables
         scope -> Scope of the sync
         sync_rw -> 0 - read, 1 - write"""
-        self.sync_type = sync_type
-        self.variables = variable
+        self.type = sync_type
+        self.variable = variable
         self.scope = scope
         self.init_depth = scope.depth
-        self.sync_rw = sync_type
+        self.rw = sync_rw
 
     def mutate_type(self):
         self.sync_type = random.randrange(2)
