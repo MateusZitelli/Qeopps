@@ -14,7 +14,7 @@ class TreeNode:
         child.depth = self.depth + 1
 
     def string_node(self):
-        return "[" + str(self.data) + "]"
+        return "[" + str(self.data[1]) + "]"
 
 class Tree:
     def __init__(self, root=None):

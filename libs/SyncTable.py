@@ -1,14 +1,20 @@
 import random, copy
 import Tree
+
+SYNC_TYPE = {"mutex":0, "stm":1}
+SYNC_RW = {"read":0, "write":1}
+
 class Sync:
-    def __init__(self, sync_type, variables, scope):
-    """ sync_type -> 0 - Mutex, 1 - STM
-        variables -> List of variables calsses
-        scope -> Scope of the sync"""
+    def __init__(self, sync_type, variable, scope, sync_rw):
+        """sync_type -> 0 - Mutex, 1 - STM
+        variables -> List of variables
+        scope -> Scope of the sync
+        sync_rw -> 0 - read, 1 - write"""
         self.sync_type = sync_type
-        self.variables = list(variables)
+        self.variables = variable
         self.scope = scope
         self.init_depth = scope.depth
+        self.sync_rw = sync_type
 
     def mutate_type(self):
         self.sync_type = random.randrange(2)
@@ -38,7 +44,7 @@ class SyncTable:
         if(transactions != None):
             self.transactions = list(transacations)
         else:
-            self.transactions = []
+            self.transactions = list()
         self.size = len(self.transactions)
 
     def mutate(self, mutation_type = None):
