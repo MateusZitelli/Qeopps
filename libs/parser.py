@@ -130,4 +130,4 @@ class Parser:
         #self.tree.print_tree()
 
 if __name__ == "__main__":
-    Parser("teste2.c").parse()
+    Parser("examples/teste2.c").parse()

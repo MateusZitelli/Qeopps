@@ -63,7 +63,7 @@ class Generator:
         self.code_file.close()
 
 if __name__ == "__main__":
-    p = Parser("teste2.c")
+    p = Parser("examples/teste2.c")
     p.parse()
-    g = Generator(p.tree, "code.c", p.syncTable)
+    g = Generator(p.tree, "examples/code.c", p.syncTable)
     g.generate_code()
