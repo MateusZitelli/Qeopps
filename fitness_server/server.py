@@ -2,7 +2,6 @@ import socket, subprocess
 from threading import *
 
 class Server( Thread ):
-
     def __init__(self):
         Thread.__init__(self)
 
@@ -13,25 +12,24 @@ class Server( Thread ):
     def bindmsock(self):
         self.msock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.msock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.msock.bind(('', 9090))
+        self.msock.bind(('0.0.0.0', 9090))
         self.msock.listen(1)
         print '[Server] Listening on port 9090'
 
     def acceptmsock(self):
         self.mconn, self.maddr = self.msock.accept()
         print '[Server] Got connection from', self.maddr
-    
+
     def bindcsock(self):
         self.csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.csock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.csock.bind(('', 9091))
+        self.csock.bind(('0.0.0.0', 9091))
         self.csock.listen(1)
         print '[Server] Listening on port 9091'
 
     def acceptcsock(self):
-        self.cconn, self.maddr = self.csock.accept()
-        print '[Server] Got connection from', self.maddr
-        
+        self.cconn, self.caddr = self.csock.accept()
+        print '[Server] Got connection from', self.caddr
         while 1:
             data = self.cconn.recv(1024)
             if not data:
@@ -60,7 +58,7 @@ class Server( Thread ):
         f.close()
         self.change_binary_permission()
         print '[Server] Got "%s"' % self.cfilename
-        print '[Server] Closing file transfer for "%s"' % self.cfilename   
+        print '[Server] Closing file transfer for "%s"' % self.cfilename
 
     def compile(self):
         print "[Server] Compiling %s" % self.cfilename
@@ -69,11 +67,13 @@ class Server( Thread ):
         print "[Server] Compilation command \"%s\"" % command_string
         proc = subprocess.Popen(command_string , shell=True,\
         stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.compile_error = False
         for line in proc.stderr:
+            self.compile_error = True
             print("stderr: " + line.rstrip())
         for line in proc.stdout:
-            print("stdout: " + line.rstrip()) 
-    
+            print("stdout: " + line.rstrip())
+
     def close(self):
         self.cconn.close()
         self.csock.close()
@@ -82,7 +82,7 @@ class Server( Thread ):
 
     def send_benchmark(self, value):
         ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ms.connect(("localhost", 9092))
+        ms.connect((self.maddr[0], 9092))
         ms.send(value)
         ms.close()
 
@@ -103,6 +103,8 @@ class Server( Thread ):
             shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         gprof_output = ";".join([",".join([j.replace("\n", "")\
             for j in i.split(" ") if j != ""]) for i in proc.stdout][5:])
+        for line in proc.stdout:
+            print line
         for line in proc.stderr:
             print("Gprof stderr: " + line.rstrip())
         return gprof_output
@@ -125,7 +127,7 @@ class Server( Thread ):
                 self.transfer()
                 self.compile()
                 self.benchmark()
-                self.clean()
+                #self.clean()
             self.close()
 
 #------------------------------------------------------------------------

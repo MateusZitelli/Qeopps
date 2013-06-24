@@ -3,7 +3,7 @@ from SyncTable import *
 import re
 
 NODE_TYPE = {"NORMAL_NODE":0, "FUNCTION_NODE": 1}
-VERBOSE = 0
+VERBOSE = 1
 class Tag:
     def __init__(self, read_vars, write_vars):
         self.rvars = read_vars
@@ -12,7 +12,15 @@ class Tag:
 class Parser:
     def __init__(self, filename):
         f = open(filename, "rU")
-        self.text = re.sub(r"([\{\}])", r"\1;", f.read()).replace("*/", "*/;")
+        text = f.read()
+        lines = []
+        for l in text.split('\n'):
+            if "#" in l:
+                lines.append(l+";")
+            else:
+                lines.append(l)
+        text = "\n".join(lines)
+        self.text = re.sub(r"([\{\}])", r"\1;", text).replace("*/", "*/;")
         self.commands = self.text.split(";")
         f.close()
         self.tree = Tree.Tree(Tree.TreeNode("program"))
@@ -122,11 +130,13 @@ class Parser:
                 function_node.data.append(function_string)
                 current_node.childs.append(function_node)
                 continue
+
             #Parse command lines
             command_match = re.match(r'\s*(.+)', j)
             if command_match:
                 command_node = self.tree.new_node((NODE_TYPE["NORMAL_NODE"],command_match.group(1)), current_node)
-                if VERBOSE: print current_node.depth * " ",command_match.group(1)
+                if VERBOSE:
+                    print current_node.depth * " ", command_match.group(1)
         #self.tree.print_tree()
 
 if __name__ == "__main__":

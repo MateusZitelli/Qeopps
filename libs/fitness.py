@@ -2,22 +2,22 @@
 
 import sys, socket, subprocess, time
 
-HOST = 'localhost'
 CPORT = 9091
 MPORT = 9090
 RPORT = 9092
 
 class Fitness:
-    def __init__(self, cfile, compiler = "", flags = ""):
+    def __init__(self, cfile, compiler="", flags="", host="0.0.0.0"):
         self.cfile = cfile
         self.cfileServerSide = cfile[:-2] + ".ss.c"
         self.compiler = compiler
         self.flags = flags
+        self.host = host
 
     def send_instructions(self):
-        print "[Client] Sending file receive task to Server"
+        print "[Client] Sending \"file receive\" task to Server"
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        cs.connect((HOST, CPORT))
+        cs.connect((self.host, CPORT))
         cs.send("BENCH;%s;%s;%s" % (self.cfileServerSide,self.compiler,\
             self.flags))
         cs.close()
@@ -25,8 +25,9 @@ class Fitness:
     def send_cfile(self):
         print "[Client] Sending binary"
         self.send_instructions()
+        time.sleep(0.01)
         ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ms.connect((HOST, MPORT))
+        ms.connect((self.host, MPORT))
         f = open(self.cfile, "rb")
         data = f.read()
         f.close()
@@ -38,7 +39,11 @@ class Fitness:
         self.benchs = self.bench_data.split(";")
         for i, j in enumerate(self.benchs[::1]):
             infos = j.split(",")
-            results.append([infos[3], float(infos[0]), float(infos[1]), float(infos[2])])
+            print infos
+            try:
+                results.append([infos[3], float(infos[0]), float(infos[1]), float(infos[2])])
+            except:
+                pass
         return results
 
     def bindbsock(self):
@@ -59,7 +64,7 @@ class Fitness:
         print "[Client] Shutting Down server"
         time.sleep(1)
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        cs.connect((HOST, CPORT))
+        cs.connect((self.host, CPORT))
         cs.send("EXIT")
         cs.close()
 
@@ -68,6 +73,6 @@ class Fitness:
         return self.receive_benchmark()
 
 if __name__ == '__main__':
-    f = Fitness("./teste.c", "gcc", "-pthread -pg")
+    f = Fitness("./teste.c", "gcc", "-pthread -pg -fgnu-tm")
     print f.benchmark()
     f.shutdown_server()
