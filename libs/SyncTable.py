@@ -106,6 +106,8 @@ class SyncTable:
 
 def generate_population(base_table, population_size,\
     scope_mutations, type_mutations):
+    if len(base_table.transactions) == 0:
+        return []
     population = list()
     for i in range(population_size):
         population.append(base_table.get_copy())

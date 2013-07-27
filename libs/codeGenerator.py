@@ -67,7 +67,7 @@ class Generator:
             if not "#" in n.data[1]:
                 self.write_definitions()
             #if the node contain a function
-            if n.data[0] == NODE_TYPE["FUNCTION_NODE"]:
+            if n.data[0] == NODE_TYPE["PERIOD_NODE"]:
                 #if the function is already defined, print the calling and
                 #go to the next node
                 if n.data[2] in self.defined_functions:

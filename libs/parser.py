@@ -2,7 +2,7 @@ import Tree
 from SyncTable import *
 import re
 
-NODE_TYPE = {"NORMAL_NODE":0, "FUNCTION_NODE": 1}
+NODE_TYPE = {"NORMAL_NODE":0, "PERIOD_NODE": 1}
 VERBOSE = 1
 class Tag:
     def __init__(self, read_vars, write_vars):
@@ -37,8 +37,8 @@ class Parser:
                 next_commands_already_parseds -= 1
                 continue
             #Parse end of a period
-            match_end_period = re.match(r'\s*}', j)
-            if match_end_period:
+            match_end_of_period = re.match(r'\s*}', j)
+            if match_end_of_period:
                 current_node = current_node.parent
                 continue
 
@@ -114,10 +114,20 @@ class Parser:
                 function_name = match_functions.group(2)
                 args = match_functions.group(3)
                 func_string = "%s %s(%s)" % (return_type, function_name, args)
-                func_node = self.tree.new_node([NODE_TYPE["FUNCTION_NODE"],func_string, function_name], current_node)
+                func_node = self.tree.new_node([NODE_TYPE["PERIOD_NODE"],func_string, function_name], current_node)
                 if VERBOSE: print current_node.depth * " ", func_string
                 current_node = func_node
                 self.functions[function_name] = func_node
+                continue
+
+            #Parse structs declarations
+            match_struct = re.match(r'\s*struct\s*(.*)[\s\n]*{', j)
+            if match_struct:
+                struct_name = match_struct.group(1)
+                struct_string = "struct %s" % (struct_name)
+                struct_node = self.tree.new_node([NODE_TYPE["PERIOD_NODE"], struct_string], current_node)
+                if VERBOSE: print current_node.depth * " ", struct_string
+                current_node = struct_node
                 continue
 
             #Parse fuctions calls
