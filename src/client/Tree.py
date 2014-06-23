@@ -8,6 +8,7 @@ class TreeNode:
             self.depth = self.parent.depth + 1
         else:
             self.depth = 0
+
     def add_child(self, child):
         self.childs.append(child)
         child.parent = self

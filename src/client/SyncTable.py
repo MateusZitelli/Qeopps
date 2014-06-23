@@ -2,7 +2,7 @@ import random, copy
 import Tree
 
 SYNC_TYPE = {"mutex":0, "stm":1}
-SYNC_RW = {"read":0, "write":1}
+SYNC_RW = {"read":0, "write":1, "read_vector":0, "write_vector":1}
 MUTATION_TYPES = {"TYPE":0, "SINGLE_SYNC_SCOPE":1, "TRANSACTION_SCOPE":2}
 
 class Sync:

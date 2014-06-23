@@ -2,7 +2,7 @@ import Tree
 from SyncTable import *
 import re
 
-NODE_TYPE = {"NORMAL_NODE":0, "PERIOD_NODE": 1}
+NODE_TYPE = {"NORMAL_NODE":0, "FUNCTION_NODE": 1}
 VERBOSE = 1
 class Tag:
     def __init__(self, read_vars, write_vars):
@@ -51,13 +51,34 @@ class Parser:
                 current_node = new_node
                 continue
 
-            #Parse Queopps optimization tag
-            match_Queopps_tag = re.match(r'\s*/\*\s*Queopps-TAG\s*(read|write)\s*\((.*?)\)\s*(read|write)\s*\((.*?)\)\s*\*/', j)
-            if match_Queopps_tag:
+            #Parse Queopps optimization tag for variables
+            match_Queopps_tag_var = re.match(r'\s*/\*\s*Queopps-TAG_var\s*(read|write)\s*\((.*?)\)\s*(read|write)\s*\((.*?)\)\s*\*/', j)
+            if match_Queopps_tag_var:
                 syncs = list()
-                for i, j in enumerate(match_Queopps_tag.groups()[::2]):
-                    varibles = match_Queopps_tag.groups()[i * 2 + 1].split(",")
+                for i, j in enumerate(match_Queopps_tag_var.groups()[::2]):
+                    varibles = match_Queopps_tag_var.groups()[i * 2 + 1].split(",")
                     for var in varibles:
+                        print var
+                        var = var.strip(" ")
+                        if var == "":
+                            continue
+                        if VERBOSE: print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
+                        s = Sync(SYNC_TYPE["mutex"], var, current_node, SYNC_RW[j])
+                        syncs.append(s)
+                t = Transaction(syncs)
+                self.syncTable.transactions.append(t)
+                continue
+
+            #Parse Queopps optimization tag for vectors
+            match_Queopps_tag_vect = re.match(r'\s*/\*\s*Queopps-TAG_vect\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*\*/', j)
+            if match_Queopps_tag_vect:
+                syncs = list()
+                for i, j in enumerate(match_Queopps_tag_vect.groups()[::3]):
+                    varibles = match_Queopps_tag_vect.groups()[i * 3 + 1].split(",")
+                    vector_size = match_Queopps_tag_vect.groups()[i * 3 + 2].split(",")
+                    print zip(varibles, vector_size)
+                    for var in varibles:
+                        print var
                         var = var.strip(" ")
                         if var == "":
                             continue
@@ -114,7 +135,7 @@ class Parser:
                 function_name = match_functions.group(2)
                 args = match_functions.group(3)
                 func_string = "%s %s(%s)" % (return_type, function_name, args)
-                func_node = self.tree.new_node([NODE_TYPE["PERIOD_NODE"],func_string, function_name], current_node)
+                func_node = self.tree.new_node([NODE_TYPE["FUNCTION_NODE"],func_string, function_name], current_node)
                 if VERBOSE: print current_node.depth * " ", func_string
                 current_node = func_node
                 self.functions[function_name] = func_node
@@ -125,7 +146,7 @@ class Parser:
             if match_struct:
                 struct_name = match_struct.group(1)
                 struct_string = "struct %s" % (struct_name)
-                struct_node = self.tree.new_node([NODE_TYPE["PERIOD_NODE"], struct_string], current_node)
+                struct_node = self.tree.new_node([NODE_TYPE["NORMAL_NODE"], struct_string], current_node)
                 if VERBOSE: print current_node.depth * " ", struct_string
                 current_node = struct_node
                 continue
