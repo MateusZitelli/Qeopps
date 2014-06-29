@@ -1,6 +1,6 @@
 # USAGE: python Fitness.py
 
-import sys, socket, subprocess, time
+import sys, socket, subprocess, time, re
 
 CPORT = 9091
 MPORT = 9090
@@ -38,13 +38,9 @@ class Fitness:
         results = []
         self.benchs = self.bench_data.split(";")
         for i, j in enumerate(self.benchs[::1]):
-            infos = j.split(",")
-            print infos
-            try:
-                results.append([infos[3], float(infos[0]), float(infos[1]), float(infos[2])])
-            except:
-                pass
-        return results
+            match = re.match(r'\[1\],100\.0,([0-9\.]*),.*', j)
+            if match:
+              return match.group(1)
 
     def bindbsock(self):
         self.bsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

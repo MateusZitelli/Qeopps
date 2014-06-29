@@ -35,13 +35,14 @@ class Queopps:
 
     def must_stop(self):
         if "max_generations" in self.settings:
-            if self.settings["max_generations"] >= self.generation:
+            if self.settings["max_generations"] < self.generation:
                 return True
 
     def run(self):
         self.generation = 0
         population_size = self.settings["population_size"]
         while True:
+            print 'Generation %i' % (self.generation)
             for i, solution in enumerate(self.population):
                 file_name = self.population_dir + "Queopps_son" + str(i) + ".c"
                 code_generator = Generator(self.parser.tree, file_name,
@@ -53,10 +54,9 @@ class Queopps:
                 print server_host
                 f = Fitness(file_name, compiler_string, compiler_flags, server_host)
                 print f.benchmark()
-                sleep(0.1)
 
-            #self.population = sorted(self.population, key=lambda x: x.fitness,
-                #reverse=True)[:population_size]
+            self.population = sorted(self.population, key=lambda x: x.fitness,
+                reverse=True)[:population_size]
             self.generation += 1
             if self.must_stop():
                 break
@@ -72,5 +72,5 @@ class Queopps:
         self.run()
 
 
-q = Queopps("./nbody.c", "test.cfg")
+q = Queopps("./Programs/nbody.c", "test.cfg")
 q.start_optimization()

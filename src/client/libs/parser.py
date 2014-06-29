@@ -2,7 +2,7 @@ import Tree
 from SyncTable import *
 import re
 
-NODE_TYPE = {"NORMAL_NODE":0, "FUNCTION_NODE": 1}
+NODE_TYPE = {"NORMAL_NODE":0, "FUNCTION_NODE": 1, "STRUCT_NODE": 2}
 VERBOSE = 1
 class Tag:
     def __init__(self, read_vars, write_vars):
@@ -52,7 +52,7 @@ class Parser:
                 continue
 
             #Parse Queopps optimization tag for variables
-            match_Queopps_tag_var = re.match(r'\s*/\*\s*Queopps-TAG_var\s*(read|write)\s*\((.*?)\)\s*(read|write)\s*\((.*?)\)\s*\*/', j)
+            match_Queopps_tag_var = re.match(r'\s*/\*\s*Qeopps-TAG_var\s*(read|write)\s*\((.*?)\)\s*(read|write)\s*\((.*?)\)\s*\*/', j)
             if match_Queopps_tag_var:
                 syncs = list()
                 for i, j in enumerate(match_Queopps_tag_var.groups()[::2]):
@@ -70,7 +70,7 @@ class Parser:
                 continue
 
             #Parse Queopps optimization tag for vectors
-            match_Queopps_tag_vect = re.match(r'\s*/\*\s*Queopps-TAG_vect\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*\*/', j)
+            match_Queopps_tag_vect = re.match(r'\s*/\*\s*Qeopps-TAG_vect\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*\*/', j)
             if match_Queopps_tag_vect:
                 syncs = list()
                 for i, j in enumerate(match_Queopps_tag_vect.groups()[::3]):
@@ -146,7 +146,7 @@ class Parser:
             if match_struct:
                 struct_name = match_struct.group(1)
                 struct_string = "struct %s" % (struct_name)
-                struct_node = self.tree.new_node([NODE_TYPE["NORMAL_NODE"], struct_string], current_node)
+                struct_node = self.tree.new_node([NODE_TYPE["STRUCT_NODE"], struct_string], current_node)
                 if VERBOSE: print current_node.depth * " ", struct_string
                 current_node = struct_node
                 continue

@@ -88,7 +88,11 @@ class Generator:
                 else:
                     self.code_file.write(IDENTATION_LEVEL * (n.depth + self.transactions_extra_indentation - 1) + n.data[1] + ";\n")
             if len(n.childs) > 0:
-                self.code_file.write(IDENTATION_LEVEL * (n.depth + self.transactions_extra_indentation - 1) + "}" + "\n")
+                if n.data[0] != NODE_TYPE["STRUCT_NODE"]:
+                  close_block_string = "}"
+                else:
+                  close_block_string = "};"
+                self.code_file.write(IDENTATION_LEVEL * (n.depth + self.transactions_extra_indentation - 1) + close_block_string + "\n")
 
         if node in self.sync_dict:
             for s in self.sync_dict[node][::-1]:
