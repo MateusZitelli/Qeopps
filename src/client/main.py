@@ -2,6 +2,7 @@ from libs.codeGenerator import Generator
 from libs.SyncTable import generate_population
 from libs.parser import Parser
 from libs.fitness import Fitness
+from libs.utils import *
 from time import sleep
 import re
 
@@ -27,6 +28,12 @@ class Queopps:
                 value = int(line_match_int_value.group(2))
                 self.settings[setting] = value
                 continue
+            line_match_float_value = re.match(r'\s*(.+):(\d+.\d+)$', line)
+            if line_match_float_value:
+                setting = line_match_float_value.group(1)
+                value = float(line_match_float_value.group(2))
+                self.settings[setting] = value
+                continue
             line_match_string_value = re.match(r'\s*(.+):(.+)', line)
             if line_match_string_value:
                 setting = line_match_string_value.group(1)
@@ -38,9 +45,30 @@ class Queopps:
             if self.settings["max_generations"] < self.generation:
                 return True
 
+    def generate_new_population(self):
+      population_size = self.settings["population_size"]
+      self.population = sorted(self.population,
+                                key=lambda x: x.fitness)[:population_size]
+      new_solutions = 0
+      for i in xrange(population_size):
+        copy = None
+        if probability(self.settings["mutation_probability"]):
+          solution_index = getLinearDistributedIndex(population_size)
+          copy = self.population[solution_index].table.get_copy()
+          copy.mutate()
+        # if probability(self.settings["crossingover_probability"]):
+        #   if copy == None:
+        #     solution_index = getLinearDistributedIndex(population_size)
+        #     copy = self.population[solution_index].table.get_copy()
+        #   other_index = getLinearDistributedIndex(population_size)
+        #   other_table = self.population[other_index].table
+        #   copy = copy.cross_over(other_table)
+        if copy != None:
+          new_solutions += 1
+          self.population[population_size - new_solutions] = Solution(copy)
+
     def run(self):
         self.generation = 0
-        population_size = self.settings["population_size"]
         while True:
             print 'Generation %i' % (self.generation)
             for i, solution in enumerate(self.population):
@@ -54,9 +82,7 @@ class Queopps:
                 print server_host
                 f = Fitness(file_name, compiler_string, compiler_flags, server_host)
                 print f.benchmark()
-
-            self.population = sorted(self.population, key=lambda x: x.fitness,
-                reverse=True)[:population_size]
+            self.generate_new_population()
             self.generation += 1
             if self.must_stop():
                 break

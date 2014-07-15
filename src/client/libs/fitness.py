@@ -25,7 +25,7 @@ class Fitness:
     def send_cfile(self):
         print "[Client] Sending binary"
         self.send_instructions()
-        time.sleep(0.01)
+        time.sleep(0.001)
         ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ms.connect((self.host, MPORT))
         f = open(self.cfile, "rb")
