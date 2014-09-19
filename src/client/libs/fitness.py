@@ -7,32 +7,22 @@ MPORT = 9090
 RPORT = 9092
 
 class Fitness:
-    def __init__(self, cfile, compiler="", flags="", host="0.0.0.0"):
+    def __init__(self, cfile, compiler="gcc", flags="", host="0.0.0.0"):
         self.cfile = cfile
         self.cfileServerSide = cfile[:-2] + ".ss.c"
         self.compiler = compiler
         self.flags = flags
         self.host = host
 
-    def send_instructions(self):
+    def send_cfile(self):
         print "[Client] Sending \"file receive\" task to Server"
+        f = open(self.cfile, 'rb')
+        filedata = f.read()
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         cs.connect((self.host, CPORT))
-        cs.send("BENCH;%s;%s;%s" % (self.cfileServerSide,self.compiler,\
-            self.flags))
+        cs.send("BENCH\0%s\0%s\0%s\0%s" % (self.cfileServerSide,self.compiler,\
+            self.flags,filedata))
         cs.close()
-
-    def send_cfile(self):
-        print "[Client] Sending binary"
-        self.send_instructions()
-        time.sleep(0.001)
-        ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ms.connect((self.host, MPORT))
-        f = open(self.cfile, "rb")
-        data = f.read()
-        f.close()
-        ms.send(data)
-        ms.close()
 
     def benchmark_parser(self):
         results = []
@@ -58,7 +48,6 @@ class Fitness:
 
     def shutdown_server(self):
         print "[Client] Shutting Down server"
-        time.sleep(1)
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         cs.connect((self.host, CPORT))
         cs.send("EXIT")
@@ -69,6 +58,6 @@ class Fitness:
         return self.receive_benchmark()
 
 if __name__ == '__main__':
-    f = Fitness("./teste.c", "gcc", "-pthread -pg -fgnu-tm")
+    f = Fitness("./../Programs/nbody.c", "gcc", "-pthread -pg -fgnu-tm")
     print f.benchmark()
     f.shutdown_server()

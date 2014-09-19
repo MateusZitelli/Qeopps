@@ -9,22 +9,11 @@ class Server( Thread ):
         self.running = True
         self.process()
 
-    def bindmsock(self):
-        self.msock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.msock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.msock.bind(('0.0.0.0', 9090))
-        self.msock.listen(1)
-        print '[Server] Listening on port 9090'
-
-    def acceptmsock(self):
-        self.mconn, self.maddr = self.msock.accept()
-        print '[Server] Got connection from', self.maddr
-
     def bindcsock(self):
         self.csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.csock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.csock.bind(('0.0.0.0', 9091))
-        self.csock.listen(1)
+        self.csock.listen(10)
         print '[Server] Listening on port 9091'
 
     def acceptcsock(self):
@@ -35,24 +24,25 @@ class Server( Thread ):
             if not data:
                 break
             if data[0:5] == "BENCH":
-                data = data.split(";")
+                data = data.split("\0")
                 self.cfilename = data[1]
                 self.compiler = data[2]
                 self.flags = data[3]
                 self.binaryname = self.cfilename[:-2] + ".serverSide.bin"
                 print '[Server] Getting ready to receive "%s"' % self.cfilename
+                self.transfer(data[4])
                 break
             elif data[0:4] == "EXIT":
                 self.running = False
                 print '[Server] Received EXIT signal'
                 break
 
-    def transfer(self):
+    def transfer(self, startBytes):
         print '[Server] Starting file transfer for "%s"' % self.cfilename
-
         f = open(self.cfilename,"wb")
+        f.write(startBytes)
         while 1:
-            data = self.mconn.recv(4096)
+            data = self.cconn.recv(4096)
             if not data: break
             f.write(data)
         f.close()
@@ -77,14 +67,12 @@ class Server( Thread ):
     def close(self):
         self.cconn.close()
         self.csock.close()
-        self.mconn.close()
-        self.msock.close()
 
     def send_benchmark(self, value):
-        ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ms.connect((self.maddr[0], 9092))
-        ms.send(value)
-        ms.close()
+        cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        cs.connect((self.caddr[0], 9092))
+        cs.send(value)
+        cs.close()
 
     def change_binary_permission(self):
         proc = subprocess.Popen(["chmod +x", self.binaryname], \
@@ -122,9 +110,6 @@ class Server( Thread ):
             self.bindcsock()
             self.acceptcsock()
             if self.running:
-                self.bindmsock()
-                self.acceptmsock()
-                self.transfer()
                 self.compile()
                 self.benchmark()
                 #self.clean()
