@@ -3,7 +3,6 @@
 import sys, socket, subprocess, time, re
 
 CPORT = 9091
-MPORT = 9090
 RPORT = 9092
 
 class Fitness:
@@ -24,13 +23,16 @@ class Fitness:
             self.flags,filedata))
         cs.close()
 
-    def benchmark_parser(self):
+    def benchmark_gprof_parser(self):
         results = []
         self.benchs = self.bench_data.split(";")
         for i, j in enumerate(self.benchs[::1]):
             match = re.match(r'\[1\],100\.0,([0-9\.]*),.*', j)
             if match:
               return match.group(1)
+
+    def benchmark_time_parser(self):
+        return float(self.bench_data)
 
     def bindbsock(self):
         self.bsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,7 +46,7 @@ class Fitness:
         print "[Client] Receiving benchmark"
         self.bench_data = self.bconn.recv(1024)
         self.bsock.close()
-        return self.benchmark_parser()
+        return self.benchmark_time_parser()
 
     def shutdown_server(self):
         print "[Client] Shutting Down server"

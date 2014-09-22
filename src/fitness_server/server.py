@@ -1,5 +1,8 @@
-import socket, subprocess
+import socket, subprocess, re
 from threading import *
+
+# Example: 0.18user 0.00system 0:00.18elapsed 99%CPU (0avgtext+0avgdata 3312maxresident)
+time_profiler_pattern = r"(.*)user (.*)system (.*)elapsed (.*)%CPU"
 
 class Server( Thread ):
     def __init__(self):
@@ -86,7 +89,7 @@ class Server( Thread ):
         for line in proc.stderr:
             print("stderr: " + line.rstrip())
 
-    def get_profile(self):
+    def get_gprof_profile(self):
         proc = subprocess.Popen("gprof -b " + self.binaryname, \
             shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         gprof_output = ";".join([",".join([j.replace("\n", "")\
@@ -95,11 +98,25 @@ class Server( Thread ):
             print line
         for line in proc.stderr:
             print("Gprof stderr: " + line.rstrip())
+        print "gprof -b " + self.binaryname
         return gprof_output
+
+    def get_time_profile(self):
+        proc = subprocess.Popen("(time %s)" % (self.binaryname), \
+            shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+
+        for line in proc.stderr:
+            match = re.match(time_profiler_pattern, line)
+            if match:
+                break
+
+        # Return sys time
+        return match.group(1)
+
 
     def benchmark(self):
         self.run_binary()
-        self.send_benchmark(self.get_profile())
+        self.send_benchmark(self.get_time_profile())
 
     def clean(self):
         subprocess.call("rm -rf gmon.out %s %s" %(self.binaryname,\
