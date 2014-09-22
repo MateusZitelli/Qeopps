@@ -17,11 +17,10 @@ class Solution:
 
 class Qeopps:
     """Create the enviroment for the optimizations based on the config file."""
-    def __init__(self, aim_program_file_name, config_file_name):
-        self.aim_program_file_name = aim_program_file_name
+    def __init__(self, config_file_name):
         self.config_file = open(config_file_name, 'r')
         self.get_config()
-        self.parser = Parser(self.aim_program_file_name)
+        self.parser = Parser(self.settings['target_program'])
         self.population_dir = self.settings["population_programs_dir"]
 
     def get_config(self):
@@ -116,5 +115,5 @@ class Qeopps:
         self.run()
 
 
-q = Qeopps("./Programs/nbody.c", "test.cfg")
+q = Qeopps("test.cfg")
 q.start_optimization()
