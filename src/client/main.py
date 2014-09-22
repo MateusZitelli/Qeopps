@@ -15,7 +15,7 @@ class Solution:
         self.table = table
         self.fitness = None
 
-class Queopps:
+class Qeopps:
     """Create the enviroment for the optimizations based on the config file."""
     def __init__(self, aim_program_file_name, config_file_name):
         self.aim_program_file_name = aim_program_file_name
@@ -90,7 +90,7 @@ class Queopps:
         while True:
             print 'Generation %i' % (self.generation)
             for i, solution in enumerate(self.population):
-                file_name = self.population_dir + "Queopps_son" + str(i) + ".c"
+                file_name = self.population_dir + "Qeopps_son" + str(i) + ".c"
                 code_generator = Generator(self.parser.tree, file_name,
                     solution.table)
                 code_generator.generate_code()
@@ -116,5 +116,5 @@ class Queopps:
         self.run()
 
 
-q = Queopps("./Programs/nbody.c", "test.cfg")
+q = Qeopps("./Programs/nbody.c", "test.cfg")
 q.start_optimization()

@@ -51,32 +51,32 @@ class Parser:
                 current_node = new_node
                 continue
 
-            #Parse Queopps optimization tag for variables
-            match_Queopps_tag_var = re.match(r'\s*/\*\s*Qeopps-TAG_var\s*(read|write)\s*\((.*?)\)\s*(read|write)\s*\((.*?)\)\s*\*/', j)
-            if match_Queopps_tag_var:
+            #Parse Qeopps optimization tag for variables
+            match_Qeopps_tag_var = re.match(r'\s*/\*\s*Qeopps-TAG_var\s*(read|write)\s*\((.*?)\)\s*(read|write)\s*\((.*?)\)\s*\*/', j)
+            if match_Qeopps_tag_var:
                 syncs = list()
-                for i, j in enumerate(match_Queopps_tag_var.groups()[::2]):
-                    varibles = match_Queopps_tag_var.groups()[i * 2 + 1].split(",")
+                for i, j in enumerate(match_Qeopps_tag_var.groups()[::2]):
+                    varibles = match_Qeopps_tag_var.groups()[i * 2 + 1].split(",")
                     for var in varibles:
                         print var
                         var = var.strip(" ")
                         if var == "":
                             continue
                         if VERBOSE:
-                            print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
+                            print current_node.depth * " ", "Qeopps_tag ->",var, "<->", j
                         s = Sync(SYNC_TYPE["mutex"], var, current_node, SYNC_RW[j])
                         syncs.append(s)
                 t = Transaction(syncs)
                 self.syncTable.addTransaction(t)
                 continue
 
-            #Parse Queopps optimization tag for vectors
-            match_Queopps_tag_vect = re.match(r'\s*/\*\s*Qeopps-TAG_vect\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*\*/', j)
-            if match_Queopps_tag_vect:
+            #Parse Qeopps optimization tag for vectors
+            match_Qeopps_tag_vect = re.match(r'\s*/\*\s*Qeopps-TAG_vect\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*(read|write)\s*\((.*?)\[(.*?)\]\)\s*\*/', j)
+            if match_Qeopps_tag_vect:
                 syncs = list()
-                for i, j in enumerate(match_Queopps_tag_vect.groups()[::3]):
-                    varibles = match_Queopps_tag_vect.groups()[i * 3 + 1].split(",")
-                    vector_size = match_Queopps_tag_vect.groups()[i * 3 + 2].split(",")
+                for i, j in enumerate(match_Qeopps_tag_vect.groups()[::3]):
+                    varibles = match_Qeopps_tag_vect.groups()[i * 3 + 1].split(",")
+                    vector_size = match_Qeopps_tag_vect.groups()[i * 3 + 2].split(",")
                     print zip(varibles, vector_size)
                     for var in varibles:
                         print var
@@ -84,7 +84,7 @@ class Parser:
                         if var == "":
                             continue
                         if VERBOSE:
-                            print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
+                            print current_node.depth * " ", "Qeopps_tag ->",var, "<->", j
                         s = Sync(SYNC_TYPE["mutex"], var, current_node, SYNC_RW[j])
                         syncs.append(s)
                 t = Transaction(syncs)
