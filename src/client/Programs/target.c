@@ -27,6 +27,8 @@ void * init(void *threadarg){
 	for(j = 0; j < 100; j++){
 		for(i = 0; i < N; i++){
 			/*Qeopps-TAG_vect read(force[N]) write(force[N])*/
+			/*Qeopps-TAG_vect read(speed[N]) write(speed[N])*/
+			/*Qeopps-TAG_vect read(position[N]) write(position[N])*/
 			args->force[i].x = 0;
 			args->force[i].y = 0;
 			args->force[i].z = 0;
