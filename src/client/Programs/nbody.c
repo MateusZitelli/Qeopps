@@ -3,50 +3,58 @@
 #include <pthread.h>
 #include <math.h>
 
-#define N 100000
+#define N 500
 #define THREADS_MAX 10
-
+struct thread_data{
+  int thread_id;
+  struct vector * force;
+  struct vector * position;
+  struct vector * speed;
+};
 
 struct vector{
-
-
-
-float x;
+  float x;
 	float y;
 	float z;
 };
 
-void init(struct vector * force, struct vector * position, struct vector * speed){
+struct thread_data thread_data_array[THREADS_MAX];
 
-
-
+void * init(void *threadarg){
 	int i, j;
+  struct thread_data *args;
+  args = (struct thread_data *) threadarg;
 	for(j = 0; j < 100; j++){
 		for(i = 0; i < N; i++){
 			/*Qeopps-TAG_vect read(force[N]) write(force[N])*/
-
-
-
-			force[i].x = 0;
-			force[i].y = 0;
-			force[i].z = 0;
-			speed[i].x = 0;
-			speed[i].y = 0;
-			speed[i].z = 0;
-			position[i].x = rand() % 100000 / 100000 * 1000;
-			position[i].y = rand() % 100000 / 100000 * 1000;
-			position[i].z = rand() % 100000 / 100000 * 1000;
+			args->force[i].x = 0;
+			args->force[i].y = 0;
+			args->force[i].z = 0;
+			args->speed[i].x = 0;
+			args->speed[i].y = 0;
+			args->speed[i].z = 0;
+			args->position[i].x = rand() % 100000 / 100000 * 1000;
+			args->position[i].y = rand() % 100000 / 100000 * 1000;
+			args->position[i].z = rand() % 100000 / 100000 * 1000;
 		}
 	}
 }
 
 int main(void){
-srand(10);
-pthread_t threads[THREADS_MAX];
+  int rc, i;
+  srand(10);
+  pthread_t threads[THREADS_MAX];
 	struct vector * force, * position, * speed;
 	force = (struct vector *) malloc(N * sizeof(struct vector));
 	position = (struct vector *) malloc(N * sizeof(struct vector));
 	speed = (struct vector *) malloc(N * sizeof(struct vector));
-	init(force, position, speed);
-	return 0;
+  for(i = 0; i < THREADS_MAX; i++){
+    thread_data_array[i].thread_id = i;
+    thread_data_array[i].force = force;
+    thread_data_array[i].position = position;
+    thread_data_array[i].speed = speed;
+    rc = pthread_create(&threads[i], NULL, init, (void *) &thread_data_array[i]);
+  }
+  pthread_exit(NULL);
+  return 0;
 }
