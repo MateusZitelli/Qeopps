@@ -57,12 +57,14 @@ class Transaction:
 class SyncTable:
     def __init__(self, transactions=None):
         if transactions is not None:
-            self.transactions = list(transacations)
+            self.transactions = list(transactions)
         else:
             self.transactions = list()
         self.size = len(self.transactions)
 
     def mutate(self, mutation_type=None):
+        if self.size == 0:
+            return
         if mutation_type is None:
             mutation_type = random.randrange(3)
         if(mutation_type == 0):
@@ -79,7 +81,9 @@ class SyncTable:
 
     def cross_over(self, other):
         min_table_size = min(self.size, other.size)
-        cut_point = random.randrange(0, min_table_size)
+        cut_point = 0
+        if min_table_size > 0:
+            cut_point = random.randrange(0, min_table_size)
         slices = [self.transactions[0:cut_point],
             self.transactions[cut_point:],
             other.transactions[0:cut_point],
@@ -98,10 +102,14 @@ class SyncTable:
                 return False
         return True
 
+    def addTransaction(self, transaction):
+        self.transactions.append(transaction)
+        self.size += 1
+
     def get_copy(self):
         new_table = SyncTable()
         for t in self.transactions:
-            new_table.transactions.append(t.get_copy())
+            new_table.addTransaction(t.get_copy())
         return new_table
 
 def generate_population(base_table, population_size,\

@@ -62,11 +62,12 @@ class Parser:
                         var = var.strip(" ")
                         if var == "":
                             continue
-                        if VERBOSE: print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
+                        if VERBOSE:
+                            print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
                         s = Sync(SYNC_TYPE["mutex"], var, current_node, SYNC_RW[j])
                         syncs.append(s)
                 t = Transaction(syncs)
-                self.syncTable.transactions.append(t)
+                self.syncTable.addTransaction(t)
                 continue
 
             #Parse Queopps optimization tag for vectors
@@ -82,11 +83,12 @@ class Parser:
                         var = var.strip(" ")
                         if var == "":
                             continue
-                        if VERBOSE: print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
+                        if VERBOSE:
+                            print current_node.depth * " ", "Queopps_tag ->",var, "<->", j
                         s = Sync(SYNC_TYPE["mutex"], var, current_node, SYNC_RW[j])
                         syncs.append(s)
                 t = Transaction(syncs)
-                self.syncTable.transactions.append(t)
+                self.syncTable.addTransaction(t)
                 continue
             #Parse inline while and if
             match_while_inline = re.match(r'\s*(if|while)\(\s*(.*)\)\s*(.*)', j)
