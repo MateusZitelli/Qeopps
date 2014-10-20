@@ -1,0 +1,7 @@
+Ask HN: Parallel programs that could be optimized with genetic algorithms
+
+I'm developing a tool in my scientific initiation witch uses genetic algorithms for optimization of parallel programs in C with Posix threads, positioning mutex locks.
+
+I'm searching for problems that are not very hard to implement but could get a real improvement with a tool like that.
+
+Github with the tool https://github.com/MateusZitelli/Qeopps

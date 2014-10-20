@@ -56,7 +56,7 @@ class Server( Thread ):
     def compile(self):
         print "[Server] Compiling %s" % self.cfilename
         command_string = self.compiler + " " + self.flags + " " +\
-        self.cfilename + " -o" + self.binaryname
+        self.cfilename + " -g -o" + self.binaryname
         print "[Server] Compilation command \"%s\"" % command_string
         proc = subprocess.Popen(command_string , shell=True,\
         stderr=subprocess.PIPE, stdout=subprocess.PIPE)

@@ -92,12 +92,13 @@ class Qeopps:
                 file_name = self.population_dir + "Qeopps_son" + str(i) + ".c"
                 code_generator = Generator(self.parser.tree, file_name,
                     solution.table)
-                code_generator.generate_code()
                 compiler_string = self.settings["compiler_string"]
                 compiler_flags = self.settings["compiler_flags"]
                 server_host = self.settings["server_host"]
+                code_generator.generate_code()
                 f = Fitness(file_name, compiler_string, compiler_flags, server_host)
-                print f.benchmark()
+                solution.fitness = f.benchmark()
+                print solution.fitness
             self.update_population()
             self.generation += 1
             if self.must_stop():

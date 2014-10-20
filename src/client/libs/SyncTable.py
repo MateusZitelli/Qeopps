@@ -19,6 +19,8 @@ class Sync:
         self.text = None
 
     def mutate_type(self):
+        #TODO
+        return
         self.type = random.randrange(2)
 
     def mutate_scope(self, move_up = None):
