@@ -1,4 +1,4 @@
-#Qeopps
+# Qeopps
 > *(Q)eopps is an (e)volutionary (o)ptimizer for (p)arallel (p)rogram(s)*
 
 Qeopps is a tool to optimize parallel programs written in C with posix threads,
