@@ -41,6 +41,3 @@ $ python main.py
 After *reaching* the maximum generations number defined in the configuration file,
 the solutions obtained in the last generation will be available in the directory
 defined as ```population_programs_dir``` in the configuration.
-
-
-*Under heavy development.*
